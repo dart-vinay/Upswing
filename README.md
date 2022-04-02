@@ -14,7 +14,7 @@ The program contains an executable file called main. Run the file with the follw
 
 Example: The below command retires the function using exponential strategy with backing off exponent as 3 and max retry count as 4. 
 ```bash
-./main.go -strategy 1 -param 3 -max-retries 4
+./main -strategy 1 -param 3 -max-retries 4
 ```
 
 ## Explanation
