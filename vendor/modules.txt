@@ -1,0 +1,18 @@
+# github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
+## explicit
+github.com/dchest/uniuri
+# github.com/labstack/gommon v0.3.1
+## explicit
+github.com/labstack/gommon/color
+github.com/labstack/gommon/log
+# github.com/mattn/go-colorable v0.1.11
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.14
+github.com/mattn/go-isatty
+# github.com/valyala/bytebufferpool v1.0.0
+github.com/valyala/bytebufferpool
+# github.com/valyala/fasttemplate v1.2.1
+github.com/valyala/fasttemplate
+# golang.org/x/sys v0.0.0-20211103235746-7861aae1554b
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
