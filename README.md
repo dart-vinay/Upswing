@@ -3,7 +3,7 @@
 ## About
 
 The library provides an interface to allow the retrial of your function using the specified strategy. These are the two strategy we are using:
-* **Exponential BackOff**: Contains DB connection related information
+* **Exponential BackOff**: Retry the function again with expontial time different. Exponent would be specified by the user himself.
 * **Linear BackOff**: Retry the function after the specified time again 
 
 ## Usage
