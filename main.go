@@ -60,6 +60,8 @@ func main() {
 			if err == RetrialUpswing.ErrMaxRetryExceeds {
 				log.Infof("Max retries exceeded!!")
 				break
+			} else if err == RetrialUpswing.ErrInvalidRetrialSession {
+				log.Infof("Session Invalidated!")
 			}
 		} else if !retry {
 			//log.Infof("Denied retrial!!")

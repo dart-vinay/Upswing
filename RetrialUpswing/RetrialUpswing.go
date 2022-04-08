@@ -69,7 +69,7 @@ type RetrialRequest struct {
 	MaxRetries           int
 	SessionIdentifier    string // unique key
 	RetrialStrategy      StrategyInterface
-	LastRequestTimestamp time.Time
+	LastRequestTimestamp *time.Time
 	mutex                *sync.Mutex
 }
 
@@ -103,36 +103,35 @@ func (retrialRequest *RetrialRequest) AllowRetry() (bool, error) {
 	var err error
 	currTime := time.Now()
 
-	if RetryCountMap[retrialRequest.SessionIdentifier] == 0 {
-		retrialRequest.LastRequestTimestamp = currTime
-		RetryCountMap[retrialRequest.SessionIdentifier] = RetryCountMap[retrialRequest.SessionIdentifier] + 1
-		return true, err
-	} else if RetryCountMap[retrialRequest.SessionIdentifier] >= retrialRequest.MaxRetries {
-		delete(RetryCountMap, retrialRequest.SessionIdentifier)
+	if _, ok := RetryCountMap[retrialRequest.SessionIdentifier]; !ok {
+		return false, ErrInvalidRetrialSession
+	}
+
+	if RetryCountMap[retrialRequest.SessionIdentifier] >= retrialRequest.MaxRetries {
 		return false, ErrMaxRetryExceeds
 	} else if retrialRequest.RetrialStrategy.GetStrategyType() != "" {
 		if retrialRequest.RetrialStrategy.GetStrategyType() == ExponentialBackOff {
 			exponent := retrialRequest.RetrialStrategy.GetParamValue()
 
-			if currTime.Sub(retrialRequest.LastRequestTimestamp).Seconds() <= math.Pow(exponent, float64(RetryCountMap[retrialRequest.SessionIdentifier])) {
+			if (retrialRequest.LastRequestTimestamp != nil && currTime.Sub(*retrialRequest.LastRequestTimestamp).Seconds() <= math.Pow(exponent, float64(RetryCountMap[retrialRequest.SessionIdentifier]))) {
 				//retrialRequest.LastRequestTimestamp = currTime
 				//RetryCountMap[retrialRequest.SessionIdentifier] += 1
 				return false, err
 			} else {
 				//fmt.Println(currTime.Sub(retrialRequest.LastRequestTimestamp).Seconds())
 				//fmt.Println(math.Pow(exponent, float64(RetryCountMap[retrialRequest.SessionIdentifier])))
-				retrialRequest.LastRequestTimestamp = currTime
+				retrialRequest.LastRequestTimestamp = &currTime
 				RetryCountMap[retrialRequest.SessionIdentifier] += 1
 				return true, err
 			}
 		} else if retrialRequest.RetrialStrategy.GetStrategyType() == LinearBackOff {
 			if retrialRequest.RetrialStrategy.GetParamValue() > 0 {
-				if currTime.Sub(retrialRequest.LastRequestTimestamp).Seconds() <= float64(retrialRequest.RetrialStrategy.GetParamValue()) {
+				if (retrialRequest.LastRequestTimestamp != nil &&  currTime.Sub(*retrialRequest.LastRequestTimestamp).Seconds() <= float64(retrialRequest.RetrialStrategy.GetParamValue())) {
 					//RetryCountMap[retrialRequest.SessionIdentifier] += 1
 					//retrialRequest.LastRequestTimestamp = currTime
 					return false, err
 				} else {
-					retrialRequest.LastRequestTimestamp = currTime
+					retrialRequest.LastRequestTimestamp = &currTime
 					RetryCountMap[retrialRequest.SessionIdentifier] += 1
 					return true, err
 				}
